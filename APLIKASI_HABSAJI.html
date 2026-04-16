@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Habsaji - MTsN 2 Jember</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #eef2f3; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .app-card { background: white; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #27ae60; color: white; padding: 25px; text-align: center; }
+        .header h1 { margin: 0; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-size: 14px; }
+        .content { padding: 25px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #34495e; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #27ae60; }
+        .shalat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .check-box { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; padding: 5px 0; }
+        .check-box input { width: auto; margin: 0; }
+        button { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #219150; }
+        #menu-laporan, #success-page { display: none; }
+        .success-box { text-align: center; padding: 40px 20px; }
+        .success-icon { font-size: 50px; color: #27ae60; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="header">
+        <h1>Monitoring Habsaji</h1>
+        <p>MTsN 2 JEMBER</p>
+    </div>
+
+    <div class="content">
+        <div id="page-login">
+            <label>Nama Lengkap</label>
+            <input type="text" id="nama" placeholder="Ketik nama Anda...">
+            <label>Kelas</label>
+            <select id="kelas">
+                <option value="">-- Pilih Kelas --</option>
+		<option value="7A">Kelas 7A</option>
+                <option value="7B">Kelas 7B</option>
+                <option value="7C">Kelas 7C</option>
+                <option value="7D">Kelas 7D</option>
+                <option value="7E">Kelas 7E</option>
+                <option value="7F">Kelas 7F</option>
+                <option value="7G">Kelas 7G</option>
+                <option value="7H">Kelas 7H</option>
+                <option value="8A">Kelas 8A</option>
+                <option value="8B">Kelas 8B</option>
+                <option value="8C">Kelas 8C</option>
+                <option value="8D">Kelas 8D</option>
+                <option value="8E">Kelas 8E</option>
+                <option value="8F">Kelas 8F</option>
+                <option value="8G">Kelas 8G</option>
+                <option value="8H">Kelas 8H</option>
+                <option value="8I">Kelas 8I</option>
+                <option value="9A">Kelas 9A</option>
+                <option value="9B">Kelas 9B</option>
+                <option value="9C">Kelas 9C</option>
+                <option value="9D">Kelas 9D</option>
+                <option value="9E">Kelas 9E</option>
+                <option value="9F">Kelas 9F</option>
+                <option value="9G">Kelas 9G</option>
+                <option value="9H">Kelas 9H</option>
+                <option value="9I">Kelas 9I</option>
+                <option value="Lainnya">Lainnya</option>
+            </select>
+            <button onclick="showLaporan()">Masuk Aplikasi</button>
+        </div>
+
+        <div id="menu-laporan">
+            <p>Halo, <strong id="user-name"></strong>!</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+            
+            <label>Tanggal Ibadah:</label>
+            <input type="date" id="tgl_ibadah" onchange="validasiTanggal(this)">
+
+            <label>Shalat Hari Ini:</label>
+            <div class="shalat-grid">
+                <label class="check-box"><input type="checkbox" name="s" value="Subuh"> Subuh</label>
+                <label class="check-box"><input type="checkbox" name="s" value="Dhuhur"> Dhuhur</label>
+                <label class="check-box"><input type="checkbox" name="s" value="Ashar"> Ashar</label>
+                <label class="check-box"><input type="checkbox" name="s" value="Maghrib"> Maghrib</label>
+                <label class="check-box"><input type="checkbox" name="s" value="Isya"> Isya'</label>
+            </div>
+
+            <label>Tadarus Al-Qur'an:</label>
+            <input type="text" id="ngaji_surat" placeholder="Nama Surat">
+            <input type="text" id="ngaji_ayat" placeholder="Ayat Ke (Contoh: 1-10)">
+
+            <button onclick="kirimData()" id="btnKirim">Kirim Laporan</button>
+        </div>
+
+        <div id="success-page" class="success-box">
+            <div class="success-icon">✔</div>
+            <h2>Alhamdulillah!</h2>
+            <p>Laporan Anda sudah terkirim.</p>
+            <button onclick="location.reload()" style="background: #34495e;">Kembali</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD
+    function getHariIni() {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    function validasiTanggal(el) {
+        if (el.value > getHariIni()) {
+            alert("Maaf, Anda tidak bisa melaporkan ibadah untuk tanggal yang belum dilalui.");
+            el.value = getHariIni();
+        }
+    }
+
+    function showLaporan() {
+        const n = document.getElementById('nama').value;
+        const k = document.getElementById('kelas').value;
+        if(!n || !k) return alert("Isi Nama dan Kelas!");
+        
+        // Kunci tanggal maksimal ke hari ini
+        const tglInput = document.getElementById('tgl_ibadah');
+        tglInput.value = getHariIni();
+        tglInput.max = getHariIni(); // Ini akan membuat tanggal besok menjadi abu-abu (mati)
+
+        document.getElementById('user-name').innerText = n;
+        document.getElementById('page-login').style.display = 'none';
+        document.getElementById('menu-laporan').style.display = 'block';
+    }
+
+    function kirimData() {
+        const btn = document.getElementById('btnKirim');
+        const tglValue = document.getElementById('tgl_ibadah').value;
+
+        // Proteksi tambahan saat klik kirim
+        if (tglValue > getHariIni()) {
+            alert("Tanggal tidak valid!");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Mengirim...";
+
+        const nama = document.getElementById('nama').value;
+        const kelas = document.getElementById('kelas').value;
+        const surat = document.getElementById('ngaji_surat').value;
+        const ayat = document.getElementById('ngaji_ayat').value;
+        
+        const shalat = [];
+        document.querySelectorAll('input[name="s"]:checked').forEach(c => shalat.push(c.value));
+
+        // --- MASUKKAN ID BAPAK DI SINI ---
+        const formID = "1FAIpQLSfk4lrlDYOj1ydMIyqBptwHF59hdNdS_gzkIzYdSvRTXh_frg"; 
+        const entryTanggal = "entry.181721314"; 
+        const entryNama = "entry.1296206417"; 
+        const entryKelas = "entry.103276409"; 
+        const entryShalat = "entry.1740659401"; 
+        const entryNgaji = "entry.1071058300"; 
+
+        const url = `https://docs.google.com/forms/d/e/${formID}/formResponse`;
+        const formData = new FormData();
+        formData.append(entryTanggal, tglValue);
+        formData.append(entryNama, nama);
+        formData.append(entryKelas, kelas);
+        formData.append(entryShalat, shalat.join(", "));
+        formData.append(entryNgaji, surat + " Ayat " + ayat);
+
+        fetch(url, { method: "POST", mode: "no-cors", body: formData })
+        .then(() => {
+            document.getElementById('menu-laporan').style.display = 'none';
+            document.getElementById('success-page').style.display = 'block';
+        })
+        .catch(() => {
+            alert("Gagal mengirim.");
+            btn.disabled = false;
+            btn.innerText = "Kirim Laporan";
+        });
+    }
+</script>
+</body>
+</html>
